@@ -1,30 +1,30 @@
 const fs = require('fs');
 const path = require('path')
 
-let next_id = 1
+// let next_id = 1
 
 
-const load_users = () => {
-    return new Promise((resolve, reject) => {
-        try{
-            let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
-            users = JSON.parse(users_string).map(user => {
-                if(!user.id){
-                    let id = next_id;
-                    next_id += 1;
-                    return { ...user, id}
-                }
-                else{
-                    return user
-                }
-            })
-            resolve();
-        }
-        catch(e){
-            reject(e);
-        }
-    })
-}
+// const load_users = () => {
+//     return new Promise((resolve, reject) => {
+//         try{
+//             let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
+//             users = JSON.parse(users_string).map(user => {
+//                 if(!user.id){
+//                     let id = next_id;
+//                     next_id += 1;
+//                     return { ...user, id}
+//                 }
+//                 else{
+//                     return user
+//                 }
+//             })
+//             resolve();
+//         }
+//         catch(e){
+//             reject(e);
+//         }
+//     })
+// }
 
 
 const getUsers = () => {
@@ -47,15 +47,13 @@ const writeToJsonFile = (user_id, date, station_id) => {
             let users = JSON.parse(data); 
             users[user_id - 1].reservations.push(reservation); 
             fs.writeFile(path.join(__dirname, '..', 'data', 'users.json'), JSON.stringify(users), 'utf8', async()=>{
-                console.log(`successfully add ${reservation} to ${user_id}`);
-                await load_users();
                 resolve();
             }); 
         }});
     })
 }
 
-// check if user doesnt already have a reservation for other station in the same date
+// return true if user_id already have a reservation for other station in the same date
 const checkUserDateAvailability = (user_id, date) => {
     let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
     let users =  JSON.parse(users_string);
@@ -72,18 +70,13 @@ const checkUserDateAvailability = (user_id, date) => {
 
 
 const addResevationToUser = async (user_id, date, station_id) => {
-    if(!checkUserDateAvailability(user_id, date)){
         await writeToJsonFile(user_id, date, station_id);
-    }
-    else{
-        console.log('user already have station for the same day')
-    }
 }
 
 
   module.exports = {
     getUsers,
-    load_users,
+    // load_users,
     addResevationToUser,
     checkUserDateAvailability
   }

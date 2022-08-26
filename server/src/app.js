@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const usersRouter = require('./routes/users/users.router')
+const reservationsRouter = require('./routes/reservations/reservations.router');
 
 const morgan = require('morgan')
 
@@ -16,6 +17,7 @@ app.use(cors({
 app.use(express.static(path.join(__dirname, '..', 'public')))
 app.use(morgan('combined'));
 app.use('/users',usersRouter);
+app.use('/reservations', reservationsRouter)
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
   });
