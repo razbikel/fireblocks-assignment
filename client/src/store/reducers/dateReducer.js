@@ -1,5 +1,5 @@
 let initial = {
-    date: "12-11-11"
+    date: undefined
 }
 const dateReducer = (state = initial, action) => {
     switch (action.type){

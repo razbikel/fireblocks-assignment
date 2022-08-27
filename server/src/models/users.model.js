@@ -1,31 +1,6 @@
 const fs = require('fs');
 const path = require('path')
 
-// let next_id = 1
-
-
-// const load_users = () => {
-//     return new Promise((resolve, reject) => {
-//         try{
-//             let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
-//             users = JSON.parse(users_string).map(user => {
-//                 if(!user.id){
-//                     let id = next_id;
-//                     next_id += 1;
-//                     return { ...user, id}
-//                 }
-//                 else{
-//                     return user
-//                 }
-//             })
-//             resolve();
-//         }
-//         catch(e){
-//             reject(e);
-//         }
-//     })
-// }
-
 
 const getUsers = () => {
     let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
