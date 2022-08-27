@@ -5,7 +5,7 @@ let initial = {
 const reservationsReducer = (state = initial, action) => {
     switch (action.type){
         case "reservationsUpdate":
-            return { ...state, user: action.data };
+            return { ...state, reservations: action.data };
         default:
             return state;
         }

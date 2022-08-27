@@ -23,20 +23,30 @@ export default function BasicSelect(props) {
                 userObject = user;
             }
         })
+        dispatch({type: "userUpdate",data:userObject })
     }
-    dispatch({type: "userUpdate",data:userObject })
+    if(props.label === "day"){
+        dispatch({type: "dayUpdate",data:event.target.value })
+    }
   };
 
   const getItems = () => {
-    return props.data.map((item, index) => {
-        return <MenuItem key={index} value={item.name}>{item.name}</MenuItem>
-    })
+    if(props.label === "user"){
+        return props.data.map((item, index) => {
+            return <MenuItem key={index} value={item.name}>{item.name}</MenuItem>
+        })
+    }
+    else{
+        return props.data.map((item, index) => {
+            return <MenuItem key={index} value={item}>{item}</MenuItem>
+        })
+    }
+
   }
 
 
-
   return (
-    <Box sx={{ width: "140px" }}>
+    <Box sx={{ width: "140px", margin: props.label === "day" ? "auto" : "" }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">{props.label}</InputLabel>
         <Select

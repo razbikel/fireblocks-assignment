@@ -1,6 +1,6 @@
 
 let initial = {
-    user: {"name":"person-1","reservations":[],"id":1}
+    user: {}
 }
 const userReducer = (state = initial, action) => {
     switch (action.type){
