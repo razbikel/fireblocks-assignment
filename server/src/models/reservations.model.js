@@ -1,14 +1,20 @@
-const { checkUserDateAvailability, addResevationToUser } = require('./users.model')
+const { checkUserDateAvailability, addResevationToUser, deleteReservationToUser } = require('./users.model')
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 
 const getWeekDates = (date) => {
-    let today = moment(date).subtract(1, 'day').format("DD/MM/YYYY");
-    let week_dates = [0,1,2,3,4,5,6].map( day => {
-        return moment(date).add(day, 'day').format("DD/MM/YYYY")
-    })
-    return [today, ...week_dates];
+    try{
+        let today = moment(date).subtract(1, 'day').format("DD/MM/YYYY");
+        let week_dates = [0,1,2,3,4,5,6].map( day => {
+            return moment(date).add(day, 'day').format("DD/MM/YYYY")
+        })
+        return [today, ...week_dates];
+    }
+    catch(e){
+        return [];
+    }
+
 }
 
 const getDayName = (date) => {
@@ -42,7 +48,6 @@ const getReservationByDate = (date) => {
     if(dateReservations.length > 0){
         return dateReservations.map(reservation => {
             let dayName = getDayName(reservation.date);
-            // let dayName = ""
             return { ...reservation, dayName }
         })
     }
@@ -66,12 +71,18 @@ const findUserReservations = (weekReservations, user_id) => {
 
 const getReservations = (user_id, date) => {
     let weekDates = getWeekDates(date);
-    let weekReservations = {}
-    weekDates.forEach(date => {
-        weekReservations = { ...weekReservations, [date]: getReservationByDate(date) }
-    })
-    let userWeekReservations = findUserReservations(weekReservations, user_id);
-    return {weekReservations, userWeekReservations};
+    if(weekDates.length > 0){
+        let weekReservations = {}
+        weekDates.forEach(date => {
+            weekReservations = { ...weekReservations, [date]: getReservationByDate(date) }
+        })
+        let userWeekReservations = findUserReservations(weekReservations, user_id);
+        return {success: true, weekReservations, userWeekReservations};
+    }
+    else{
+        return {success: false, message: "invalid date input"}
+    }
+
 }
 
 const addReservation = async (user_id, date, station_id) => {
@@ -124,8 +135,53 @@ const addReservation = async (user_id, date, station_id) => {
 
 }
 
-const deleteResevations = () => {
+const deleteResevation = async (date, station_id, user_id) => {
+    let reservations_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'reservations.json'));
+    let reservations = JSON.parse(reservations_string);
+    let today = moment(date).subtract(1, 'day').format("DD/MM/YYYY");
+    let indexOfReservation;
+    let to_delete;
+    reservations.forEach( (reservation, index) => {
+        if(reservation.date === today && reservation.station_id === station_id && reservation.user_id === user_id){
+            indexOfReservation = index;
+            to_delete = reservation;
+        }
+    })
+    if(indexOfReservation !== undefined){
+        reservations[indexOfReservation] = undefined;
+        let deletedReservationsArray = reservations.filter( reservation => reservation !== undefined);
+        try{
+            await writeToJsonFile('reservations', deletedReservationsArray);
+            let users = await deleteReservationToUser(user_id, today, station_id);
+            if(users.length > 0){
+                await writeToJsonFile('users', users);
+                return {
+                    sucess: true,
+                    message: "reservation deleted sucessfully"
+                };
+            }
+            else{
+                return {
+                    sucess: false,
+                    message: 'delete reservation faild'
+                };
+            }
 
+        }
+        catch(e){
+            console.log(e);
+            return {
+                sucess: false,
+                message: e.message
+            };
+        }
+    }
+    else{
+        return {
+            sucess: false,
+            message: "delete reservation faild - could not find the reservation"
+        };
+    }
 }
 
 
@@ -144,5 +200,6 @@ const writeToJsonFile = (filename, reservations) => {
 
 module.exports = {
     getReservations,
-    addReservation
+    addReservation,
+    deleteResevation
 }

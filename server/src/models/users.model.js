@@ -73,10 +73,45 @@ const addResevationToUser = async (user_id, date, station_id) => {
         await writeToJsonFile(user_id, date, station_id);
 }
 
+const deleteReservationToUser = async (user_id, date, station_id) => {
+    let users_string = fs.readFileSync(path.join(__dirname, '..', 'data', 'users.json'));
+    let users = JSON.parse(users_string);
+    let user_to_delete;
+    let index_to_delete;
+    let reservation_index;
+
+    for(let i = 0; i < users.length; i++){
+        if(users[i].id === parseInt(user_id)){
+            index_to_delete = i;
+        }
+    }
+
+    if(index_to_delete !== undefined){
+        user_to_delete = users[index_to_delete]
+        user_to_delete.reservations.forEach((reservation, index) => {
+            if(reservation.date === date && reservation.station_id === station_id){
+                reservation_index = index;
+            }
+        })
+        if(reservation_index !== undefined){
+            let new_reservations = [ ...user_to_delete.reservations];
+            new_reservations[reservation_index] = undefined;
+            let deletedReservationsArray = new_reservations.filter( reservation => reservation !== undefined);
+            users[index_to_delete].reservations = deletedReservationsArray;
+            return users;
+        }
+    }
+    else{
+        return [];
+    }
+    
+}
+
 
   module.exports = {
     getUsers,
     // load_users,
     addResevationToUser,
-    checkUserDateAvailability
+    checkUserDateAvailability,
+    deleteReservationToUser
   }
