@@ -3,9 +3,9 @@ const { httpGetReservations, httpAddReservations } = require('./reservations.con
 
 const reservationsRouter = express.Router();
 
-reservationsRouter.get('/', httpGetReservations)
+reservationsRouter.post('/get-reservations', httpGetReservations)
 
-reservationsRouter.post('/', httpAddReservations)
+reservationsRouter.post('/add-reservation', httpAddReservations)
 
 
 

@@ -3,7 +3,8 @@ const {getReservations, addReservation} = require('../../models/reservations.mod
 
 
 const httpGetReservations = async (req, res) => {
-    const reservations = getReservations();
+    const {user_id, date} = req.body
+    const reservations = getReservations(user_id, date);
     return res.status(200).json(reservations);
 }
 

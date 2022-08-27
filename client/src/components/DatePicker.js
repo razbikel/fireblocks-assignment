@@ -8,7 +8,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 export default function BasicDatePicker() {
   const [value, setValue] = React.useState(null);
 
-  console.log('value', value && value["$d"] ? value["$d"] : "" )
+  console.log('value', value && value["$d"] ? JSON.stringify(value["$d"]) : "" )
   if(value && value["$d"]){
   console.log(moment(value["$d"]).add(1, 'day').format("DD/MM/YYYY"))
 
