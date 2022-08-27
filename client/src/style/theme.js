@@ -8,6 +8,9 @@ export const theme = createTheme({
                 h1:{
                     fontSize:"36px",
                     marginBottom:"30px"
+                },
+                h6:{
+                    fontsize:"12px"
                 }
             }
         }

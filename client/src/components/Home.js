@@ -1,4 +1,4 @@
-import { Typography, Button, getBottomNavigationActionUtilityClass } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import React, { useState, useEffect, useCallback } from 'react';
 import BasicDatePicker from './MaterialUI/DatePicker';
 import { useSelector } from 'react-redux'
@@ -22,7 +22,7 @@ const Home = () => {
 
     const [users, setUsers] = useState([]);
     const [currentWeek, setCurrentWeek] = useState([]);
-
+    const [message, setMessage] = useState("select a user and a week to continue");
 
 
     const fetchUsers = useCallback(async () => {
@@ -32,12 +32,16 @@ const Home = () => {
 
 
     const fetchReservations = async (date, user) => {
+        dispatch({type: "reservationsUpdate",data: {} })
+        dispatch({type: "dayUpdate",data: undefined })
+
         let res = await axios.post('http://localhost:8000/reservations/get-reservations', {
           user_id: user.id.toString(),
           date
         })
         dispatch({type: "reservationsUpdate",data:res.data })
         setCurrentWeek(Object.keys(res.data.weekReservations));
+        setMessage("select a day to see its stations availability")
       }
 
     const renderComputers = () => {
@@ -66,7 +70,6 @@ const Home = () => {
         fetchUsers()
     }, [])
 
-    console.log('day', day)
 
     return(
         <Box 
@@ -111,10 +114,15 @@ const Home = () => {
                 paddingTop: "25px"
             }}
             >
-                {Object.keys(reservations).length > 0 && reservations.success ?  <BasicSelect label="day" data={currentWeek}/> : null}
                 {
                     Object.keys(reservations).length > 0 && reservations.success ? 
-                    renderComputers() : null
+                    <BasicSelect label="day" data={currentWeek}/> :
+                    null
+                }
+                {
+                    day ? 
+                    renderComputers() : 
+                    <Typography variant="h5" sx={{marginTop:"150px"}}>{message}</Typography>
                 }
             </Box>
         </Box>

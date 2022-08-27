@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux'
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -15,11 +14,10 @@ export default function BasicDatePicker() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        label="choose date"
+        label="choose week"
         value={value}
         onChange={async (newValue) => {
           setValue(newValue);
-          console.log('newValue["$d"]', newValue["$d"])
           dispatch({type: "dateUpdate",date: newValue["$d"] })          
         }}
         renderInput={(params) => <TextField {...params} />}
