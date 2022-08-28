@@ -12,7 +12,6 @@ export default function BasicSelect(props) {
   const [choosenData, setchoosenData] = React.useState('');
   const dispatch = useDispatch()
 
-  
 
   const handleChange = async (event) => {
     setchoosenData(event.target.value);

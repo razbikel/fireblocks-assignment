@@ -16,6 +16,7 @@ const Home = () => {
     const user = useSelector((state) => state.user).user
     const reservations = useSelector((state) => state.reservations).reservations
     const day = useSelector((state) => state.day).day
+    const reservationError = useSelector((state) => state.reservationError).showError
 
     const dispatch = useDispatch()
 
