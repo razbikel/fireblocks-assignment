@@ -6,10 +6,9 @@ import Box from '@mui/material/Box';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
-import moment from "moment";
-import axios from 'axios';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-
+import {isStationAvailable} from './helper_functions';
+import {deleteReservation, addReservation} from "./requests";
 
 const ComputerStation = (props) => {
     const date = useSelector((state) => state.date).date
@@ -31,87 +30,8 @@ const ComputerStation = (props) => {
         alignItems: "baseline"
     }
 
-    const fetchReservations = async (date, user) => {
-        dispatch({type: "reservationsUpdate",data: {} })
-        let res = await axios.post('http://localhost:8000/reservations/get-reservations', {
-          user_id: user.id.toString(),
-          date
-        })
-        dispatch({type: "reservationsUpdate",data:res.data })
-      }
 
-    const isStationAvailable = (station_id) => {
-        let res = { available: true }
-
-        if(reservations.weekReservations){
-            let day_reservations = reservations.weekReservations[day];
-            if(day_reservations){
-                day_reservations.forEach(reservation => {
-                    if(reservation.station_id === station_id){
-                        res["available"] = false;
-                        res["user_id"] = reservation["user_id"]
-                    }
-                })
-            }
-            return res;
-        }
-    }
-
-    const addReservation = async (station_id, is_available) => {
-        // console.log(`***bp1 stationId ${station_id} date ${day}`, isUserDayReservation());
-        let userAlreadyHasReservationToday = isUserDayReservation();
-        if(userAlreadyHasReservationToday){
-            dispatch({type: "reservationErrorUpdate",data:true })
-        }
-        else{
-            if(is_available.available ){
-                let user_id = user.id.toString();
-                let choosen_date = moment(day , 'DD/MM/YYYY').add(1, 'day').format();
-                try{
-                    await axios.post('http://localhost:8000/reservations/add-reservation',{
-                        user_id,
-                        date: choosen_date,
-                        station_id,
-                    });
-                    await fetchReservations(date, user)   
-                }
-                catch(e){
-                    console.log(e);
-                }
-            }
-        }
-    }
-
-
-    const deleteReservation = async (station_id, user_id) => {
-        let choosen_date = moment(day , 'DD/MM/YYYY').add(1, 'day').format();
-        try{
-            await axios.post('http://localhost:8000/reservations/delete-reservation',{
-                user_id,
-                date: choosen_date,
-                station_id,
-            });
-            await fetchReservations(date, user)   
-        }
-        catch(e){
-            console.log(e);
-        }
-
-    }
-
-    const isUserDayReservation = () => {
-        let res = false;
-        let dayReservations = reservations.weekReservations[day];
-        dayReservations.forEach(reservation => {
-            if(reservation.user_id === user.id.toString()){
-                res = true;
-            }
-        })
-        return res;
-    }
-
-
-    let is_available = isStationAvailable(props.id)
+    let is_available = isStationAvailable(props.id, reservations, day)
 
     let style = is_available && is_available.available ? {...default_style, backgroundColor: "lightGreen", cursor: "pointer"} :
                 is_available && is_available.user_id === user.id.toString() ? {...default_style, backgroundColor: "lightBlue"} :
@@ -131,13 +51,13 @@ const ComputerStation = (props) => {
     return(
         <Box
         sx={style}
-        onClick={() => addReservation(props.id, is_available)}
+        onClick={() => addReservation(props.id, is_available, reservations, user, day, date, dispatch)}
         >
             {
                 show_delete_icon ?
                 <DeleteForeverIcon
                     sx={{width:"15px", paddingLeft:"3px", cursor:"pointer"}}
-                    onClick={() => deleteReservation(props.id, is_available.user_id)}
+                    onClick={() => deleteReservation(props.id, is_available.user_id, day, date, dispatch, user)}
                  /> : null
             }
             <Box sx={{margin: !show_delete_icon ? 'auto': ''}}>

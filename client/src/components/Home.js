@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import BasicSelect from './MaterialUI/DropDownPicker'
 import axios from 'axios';
 import ComputerStation from './ComputerStation';
+import {container_style, selectors_style, room_container_style} from './styles';
 
 
 const NUMBER_OF_STATIONS = 8;
@@ -20,17 +21,14 @@ const Home = () => {
 
     const dispatch = useDispatch()
 
-
     const [users, setUsers] = useState([]);
     const [currentWeek, setCurrentWeek] = useState([]);
     const [message, setMessage] = useState("select a user and a week to continue");
-
 
     const fetchUsers = useCallback(async () => {
         let users = await axios.get('http://localhost:8000/users');
         setUsers(users.data)
     }, [])
-
 
     const fetchReservations = async (date, user) => {
         dispatch({type: "reservationsUpdate",data: {} })
@@ -56,7 +54,6 @@ const Home = () => {
             sx={{
                 display: "flex",
                 flexWrap: "wrap",
-                paddingTop: "20px",
                 paddingLeft: "60px"
             }}
             >
@@ -70,42 +67,20 @@ const Home = () => {
         setTimeout(() => {
             dispatch({type: "reservationErrorUpdate",data:false })
         }, 3000)
-        return <Typography sx={{fontSize:"10px", color:"red"}}>You have already reserved a station for this day!</Typography>
+        return <Typography sx={{fontSize:"14px", color:"red"}}>You have already reserved a station for this day!</Typography>
     }
-
 
     useEffect(() => {
         fetchUsers()
     }, [])
 
-
-    console.log('reservationError', reservationError)
-
-
     return(
         <Box 
-        sx={{
-            height: "680px",
-            width: "500px",
-            display: "flex",
-            flexDirection: "column",
-            margin: "auto",
-            paddingTop: "30px",
-            alignItems: "center"
-            
-            
-        }}
+        sx={container_style}
         >
             <Typography variant="h1">Computers Room</Typography>
             <Box
-            sx={{
-                display:"flex",
-                flexDirection:"row",
-                alignItems:"center",
-                justifyContent: "space-between",
-                width: "575px",
-                marginBottom: "25px"
-            }}
+            sx={selectors_style}
             >
                 <BasicSelect label="user" data={users}/>
                 <Button 
@@ -115,15 +90,9 @@ const Home = () => {
                     onClick={() => fetchReservations(date, user)}
                     >load reservations</Button>
                 <BasicDatePicker />
-
             </Box>
             <Box
-            sx={{
-                height:"500px",
-                width: "500px",
-                border: "1px solid black",
-                paddingTop: "25px"
-            }}
+            sx={room_container_style}
             >
                 <Typography variant="h6">{day}</Typography>
                 {
@@ -131,9 +100,7 @@ const Home = () => {
                     <BasicSelect label="day" data={currentWeek}/> :
                     null
                 }
-                {
-                    reservationError? handleErrorMessage() : null
-                }
+                { reservationError? handleErrorMessage() : null }
                 {
                     day ? 
                     renderComputers() : 
