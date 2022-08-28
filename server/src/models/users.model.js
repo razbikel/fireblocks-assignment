@@ -85,7 +85,6 @@ const deleteReservationToUser = async (user_id, date, station_id) => {
 
   module.exports = {
     getUsers,
-    // load_users,
     addResevationToUser,
     checkUserDateAvailability,
     deleteReservationToUser
