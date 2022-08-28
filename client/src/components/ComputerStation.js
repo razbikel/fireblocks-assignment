@@ -45,7 +45,6 @@ const ComputerStation = (props) => {
 
         if(reservations.weekReservations){
             let day_reservations = reservations.weekReservations[day];
-            console.log(`***BP2 day_reservations in ${day}`, day_reservations)
             if(day_reservations){
                 day_reservations.forEach(reservation => {
                     if(reservation.station_id === station_id){
@@ -54,25 +53,31 @@ const ComputerStation = (props) => {
                     }
                 })
             }
-            console.log(`***BP1 ${station_id} is available in ${day}`, res);
             return res;
         }
     }
 
     const addReservation = async (station_id, is_available) => {
-        if(is_available.available ){
-            let user_id = user.id.toString();
-            let choosen_date = moment(day , 'DD/MM/YYYY').add(1, 'day').format();
-            try{
-                await axios.post('http://localhost:8000/reservations/add-reservation',{
-                    user_id,
-                    date: choosen_date,
-                    station_id,
-                });
-                await fetchReservations(date, user)   
-            }
-            catch(e){
-                console.log(e);
+        // console.log(`***bp1 stationId ${station_id} date ${day}`, isUserDayReservation());
+        let userAlreadyHasReservationToday = isUserDayReservation();
+        if(userAlreadyHasReservationToday){
+            dispatch({type: "reservationErrorUpdate",data:true })
+        }
+        else{
+            if(is_available.available ){
+                let user_id = user.id.toString();
+                let choosen_date = moment(day , 'DD/MM/YYYY').add(1, 'day').format();
+                try{
+                    await axios.post('http://localhost:8000/reservations/add-reservation',{
+                        user_id,
+                        date: choosen_date,
+                        station_id,
+                    });
+                    await fetchReservations(date, user)   
+                }
+                catch(e){
+                    console.log(e);
+                }
             }
         }
     }
@@ -95,18 +100,15 @@ const ComputerStation = (props) => {
     }
 
     const isUserDayReservation = () => {
-        let res = true;
-        if(reservations && reservations.userWeekReservations){
-            reservations.userWeekReservations.forEach(reservation => {
-                if(reservation.date === day){
-                    res = false;
-                }
-            })
-        }
+        let res = false;
+        let dayReservations = reservations.weekReservations[day];
+        dayReservations.forEach(reservation => {
+            if(reservation.user_id === user.id.toString()){
+                res = true;
+            }
+        })
         return res;
     }
-
-    console.log('***reservations', reservations);
 
 
     let is_available = isStationAvailable(props.id)

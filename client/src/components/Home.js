@@ -66,10 +66,20 @@ const Home = () => {
 
     }
 
+    const handleErrorMessage = () => {
+        setTimeout(() => {
+            dispatch({type: "reservationErrorUpdate",data:false })
+        }, 3000)
+        return <Typography sx={{fontSize:"10px", color:"red"}}>You have already reserved a station for this day!</Typography>
+    }
+
 
     useEffect(() => {
         fetchUsers()
     }, [])
+
+
+    console.log('reservationError', reservationError)
 
 
     return(
@@ -120,6 +130,9 @@ const Home = () => {
                     Object.keys(reservations).length > 0 && reservations.success ? 
                     <BasicSelect label="day" data={currentWeek}/> :
                     null
+                }
+                {
+                    reservationError? handleErrorMessage() : null
                 }
                 {
                     day ? 
