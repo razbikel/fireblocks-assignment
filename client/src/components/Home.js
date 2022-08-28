@@ -114,6 +114,7 @@ const Home = () => {
                 paddingTop: "25px"
             }}
             >
+                <Typography variant="h6">{day}</Typography>
                 {
                     Object.keys(reservations).length > 0 && reservations.success ? 
                     <BasicSelect label="day" data={currentWeek}/> :
